@@ -596,7 +596,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					}/* else if ( material.envMap.mapping == THREE.SphericalRefractionMapping ) {
 
-						
+
 
 					}*/
 

@@ -5,7 +5,7 @@
 
 THREE.Face3 = function ( a, b, c, normal, color, materials ) {
 
-	this.a = a; 
+	this.a = a;
 	this.b = b;
 	this.c = c;
 

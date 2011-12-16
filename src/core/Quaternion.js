@@ -82,7 +82,7 @@ THREE.Quaternion.prototype = {
 		return this;
 
 	},
-	
+
 	calculateW  : function () {
 
 		this.w = - Math.sqrt( Math.abs( 1.0 - this.x * this.x - this.y * this.y - this.z * this.z ) );
@@ -155,7 +155,7 @@ THREE.Quaternion.prototype = {
 		this.y = -q1.x * q2.z + q1.y * q2.w + q1.z * q2.x + q1.w * q2.y;
 		this.z =  q1.x * q2.y - q1.y * q2.x + q1.z * q2.w + q1.w * q2.z;
 		this.w = -q1.x * q2.x - q1.y * q2.y - q1.z * q2.z + q1.w * q2.w;
-		
+
 		return this;
 
 	},
@@ -200,7 +200,7 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 	var halfTheta = Math.acos( cosHalfTheta ),
 	sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
 
-	if ( Math.abs( sinHalfTheta ) < 0.001 ) { 
+	if ( Math.abs( sinHalfTheta ) < 0.001 ) {
 
 		qm.w = 0.5 * ( qa.w + qb.w );
 		qm.x = 0.5 * ( qa.x + qb.x );
@@ -212,7 +212,7 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 	}
 
 	var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
-	ratioB = Math.sin( t * halfTheta ) / sinHalfTheta; 
+	ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
 
 	qm.w = ( qa.w * ratioA + qb.w * ratioB );
 	qm.x = ( qa.x * ratioA + qb.x * ratioB );

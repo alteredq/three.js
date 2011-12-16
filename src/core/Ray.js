@@ -159,8 +159,8 @@ THREE.Ray.prototype = {
 			intersect = origin.clone().addSelf( direction.clone().multiplyScalar( dot ) );
 			distance = position.distanceTo( intersect );
 
-			// TODO: Check if distance is negative (object behind camera).			
-			
+			// TODO: Check if distance is negative (object behind camera).
+
 			return distance;
 
 		}

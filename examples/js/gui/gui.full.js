@@ -1,20 +1,20 @@
 var GUI = function() {
 
     var _this = this;
-    
+
     var MIN_WIDTH = 240;
     var MAX_WIDTH = 500;
-    
+
     var controllers = [];
     var listening = [];
-    
+
     var autoListen = true;
-    
+
     var listenInterval;
-    
+
     // Sum total of heights of controllers in this gui
     var controllerHeight;
-    
+
     var curControllerContainerHeight = 0;
 
     var _this = this;
@@ -28,61 +28,61 @@ var GUI = function() {
 
     // How big we get when we open
     var openHeight;
-    
+
     var name;
-    
+
     var resizeTo = 0;
     var resizeTimeout;
-    
+
     this.domElement = document.createElement('div');
     this.domElement.setAttribute('class', 'guidat');
     this.domElement.style.width = width+'px';
 
     var controllerContainer = document.createElement('div');
     controllerContainer.setAttribute('class', 'guidat-controllers');
-    
+
     // Firefox hack to prevent horizontal scrolling
     controllerContainer.addEventListener('DOMMouseScroll', function(e) {
-        
+
         var scrollAmount = this.scrollTop;
-        
+
         if (e.wheelDelta) {
-            scrollAmount+=e.wheelDelta; 
+            scrollAmount+=e.wheelDelta;
         } else if (e.detail) {
             scrollAmount+=e.detail;
         }
-            
+
         if (e.preventDefault) {
             e.preventDefault();
         }
         e.returnValue = false;
-        
+
         controllerContainer.scrollTop = scrollAmount;
-        
+
     }, false);
-    
+
     controllerContainer.style.height = '0px';
 
     var toggleButton = document.createElement('a');
     toggleButton.setAttribute('class', 'guidat-toggle');
     toggleButton.setAttribute('href', '#');
     toggleButton.innerHTML = "Show Controls";
-    
+
     var toggleDragged = false;
     var dragDisplacementY = 0;
     var togglePressed = false;
-    
+
     var my, pmy, mx, pmx;
-    
+
     var resize = function(e) {
         pmy = my;
         pmx = mx;
         my = e.pageY;
         mx = e.pageX;
-        
+
         var dmy = my - pmy;
-                
-        if (!open) { 
+
+        if (!open) {
             if (dmy > 0) {
                 open = true;
                 curControllerContainerHeight = openHeight = 1;
@@ -91,16 +91,16 @@ var GUI = function() {
                 return;
             }
         }
-        
+
         // TODO: Flip this if you want to resize to the left.
         var dmx = pmx - mx;
-        
-        if (dmy > 0 && 
+
+        if (dmy > 0 &&
             curControllerContainerHeight > controllerHeight) {
             var d = GUI.map(curControllerContainerHeight, controllerHeight, controllerHeight + 100, 1, 0);
             dmy *= d;
         }
-        
+
         toggleDragged = true;
         dragDisplacementY += dmy;
         dragDisplacementX += dmx;
@@ -112,7 +112,7 @@ var GUI = function() {
         _this.domElement.style.width = width+'px';
         checkForOverflow();
     };
-    
+
     toggleButton.addEventListener('mousedown', function(e) {
         pmy = my = e.pageY;
         pmx = mx = e.pageX;
@@ -131,23 +131,23 @@ var GUI = function() {
     }, false);
 
     document.addEventListener('mouseup', function(e) {
-        
+
         if (togglePressed && !toggleDragged) {
             _this.toggle();
         }
-        
+
         if (togglePressed && toggleDragged) {
-        
+
             if (dragDisplacementX == 0) {
                 adaptToScrollbar();
             }
-        
+
             if (openHeight > controllerHeight) {
-            
+
                 clearTimeout(resizeTimeout);
                 openHeight = resizeTo = controllerHeight;
                 beginResize();
-                
+
             } else if (controllerContainer.children.length >= 1) {
 
                 var singleControllerHeight = controllerContainer.children[0].offsetHeight;
@@ -163,51 +163,51 @@ var GUI = function() {
                 }
             }
         };
-        
-        
+
+
         document.removeEventListener('mousemove', resize, false);
         e.preventDefault();
         toggleDragged = false;
         togglePressed = false;
-        
+
         return false;
 
     }, false);
-    
+
     this.domElement.appendChild(controllerContainer);
     this.domElement.appendChild(toggleButton);
-    
+
     if (GUI.autoPlace) {
         if(GUI.autoPlaceContainer == null) {
             GUI.autoPlaceContainer = document.createElement('div');
             GUI.autoPlaceContainer.setAttribute("id", "guidat");
-            
+
             document.body.appendChild(GUI.autoPlaceContainer);
         }
         GUI.autoPlaceContainer.appendChild(this.domElement);
     }
-    
+
     this.autoListenIntervalTime = 1000/60;
-    
+
     var createListenInterval = function() {
         listenInterval = setInterval(function() {
             _this.listen();
         }, this.autoListenIntervalTime);
     };
-    
+
     this.__defineSetter__("autoListen", function(v) {
         autoListen = v;
         if (!autoListen) {
             clearInterval(listenInterval);
-        } else { 
+        } else {
             if (listening.length > 0) createListenInterval();
         }
     });
-    
+
     this.__defineGetter__("autoListen", function(v) {
         return autoListen;
     });
-    
+
     this.listenTo = function(controller) {
         // TODO: check for duplicates
         if (listening.length == 0) {
@@ -215,7 +215,7 @@ var GUI = function() {
         }
         listening.push(controller);
     };
-    
+
     this.unlistenTo = function(controller) {
         // TODO: test this
         for(var i = 0; i < listening.length; i++) {
@@ -225,18 +225,18 @@ var GUI = function() {
             clearInterval(listenInterval);
         }
     };
-    
+
     this.listen = function(whoToListenTo) {
         var arr = whoToListenTo || listening;
         for (var i in arr) {
             arr[i].updateDisplay();
         }
     };
-    
+
     this.listenAll = function() {
         this.listen(controllers);
     }
-    
+
     this.autoListen = true;
 
     var alreadyControlled = function(object, propertyName) {
@@ -285,14 +285,14 @@ var GUI = function() {
             GUI.error("Cannot create controller for data type \""+type+"\"");
             return;
         }
-    
-        var args = [this]; // Set first arg (parent) to this 
+
+        var args = [this]; // Set first arg (parent) to this
         for (var j = 0; j < arguments.length; j++) {
             args.push(arguments[j]);
         }
-    
+
         var controllerObject = construct(handler, args);
-        
+
         // Were we able to make the controller?
         if (!controllerObject) {
             GUI.error("Error creating controller for \""+propertyName+"\".");
@@ -305,25 +305,25 @@ var GUI = function() {
         GUI.allControllers.push(controllerObject);
 
         // Do we have a saved value for this controller?
-        if (type != "function" && 
+        if (type != "function" &&
             GUI.saveIndex < GUI.savedValues.length) {
             controllerObject.setValue(GUI.savedValues[GUI.saveIndex]);
             GUI.saveIndex++;
         }
-    
+
         // Compute sum height of controllers.
         checkForOverflow();
-        
+
         // Prevents checkForOverflow bug in which loaded gui appearance
         // settings are not respected by presence of scrollbar.
         if (!explicitOpenHeight) {
             openHeight = controllerHeight;
         }
-        
+
         return controllerObject;
-        
+
     }
-    
+
     var checkForOverflow = function() {
         controllerHeight = 0;
         for (var i in controllers) {
@@ -333,16 +333,16 @@ var GUI = function() {
             controllerContainer.style.overflowY = "auto";
         } else {
             controllerContainer.style.overflowY = "hidden";
-        }   
+        }
     };
-    
+
     var handlerTypes = {
         "number": GUI.NumberController,
         "string": GUI.StringController,
         "boolean": GUI.BooleanController,
         "function": GUI.FunctionController
     };
-    
+
     var alreadyControlled = function(object, propertyName) {
         for (var i in controllers) {
             if (controllers[i].object == object &&
@@ -352,7 +352,7 @@ var GUI = function() {
         }
         return false;
     };
-    
+
     var construct = function(constructor, args) {
 
         function F() {
@@ -367,7 +367,7 @@ var GUI = function() {
     }
 
     // GUI ... GUI
-    
+
     this.toggle = function() {
         open ? this.hide() : this.show();
     };
@@ -387,31 +387,31 @@ var GUI = function() {
         beginResize();
         open = false;
     }
-    
+
     this.name = function(n) {
         name = n;
         toggleButton.innerHTML = n;
     }
-    
+
     // used in saveURL
     this.appearanceVars = function() {
         return [open, width, openHeight, controllerContainer.scrollTop]
     }
-    
+
     var beginResize = function() {
         //console.log("Resizing from " + curControllerContainerHeight + " to " + resizeTo);
         curControllerContainerHeight += (resizeTo - curControllerContainerHeight)*0.6;
         if (Math.abs(curControllerContainerHeight-resizeTo) < 1) {
             curControllerContainerHeight = resizeTo;
             adaptToScrollbar();
-            
-        } else { 
+
+        } else {
             resizeTimeout = setTimeout(beginResize, 1000/30);
         }
         controllerContainer.style.height = Math.round(curControllerContainerHeight)+'px';
         checkForOverflow();
     }
-    
+
     var adaptToScrollbar = function() {
         // Clears lingering slider column
         _this.domElement.style.width = (width+1)+'px';
@@ -419,26 +419,26 @@ var GUI = function() {
             _this.domElement.style.width = width+'px';
         }, 1);
     };
-    
+
     // Load saved appearance:
 
     if (GUI.guiIndex < GUI.savedAppearanceVars.length) {
 
-    
+
         width = parseInt(GUI.savedAppearanceVars[GUI.guiIndex][1]);
         _this.domElement.style.width = width+"px";
-        
+
         openHeight = parseInt(GUI.savedAppearanceVars[GUI.guiIndex][2]);
         explicitOpenHeight = true;
         if (eval(GUI.savedAppearanceVars[GUI.guiIndex][0]) == true) {
             curControllerContainerHeight = openHeight;
             var t = GUI.savedAppearanceVars[GUI.guiIndex][3]
-            
+
             // Hack.
             setTimeout(function() {
                 controllerContainer.scrollTop = t;
             }, 0);
-            
+
             if (GUI.scrollTop > -1) {
                 document.body.scrollTop = GUI.scrollTop;
             }
@@ -451,7 +451,7 @@ var GUI = function() {
 
     GUI.allGuis.push(this);
 
-	// Add hide listener if this is the first GUI. 
+	// Add hide listener if this is the first GUI.
 	if (GUI.allGuis.length == 1) {
 		window.addEventListener('keyup', function(e) {
 			// Hide on "H"
@@ -478,7 +478,7 @@ GUI.allGuis = [];
 GUI.toggleHide = function() {
 	if (GUI.hidden) {
 		GUI.show();
-	} else { 
+	} else {
 		GUI.hide();
 	}
 }
@@ -663,7 +663,7 @@ GUI.Slider = function(numberController, min, max, step, initValue) {
     this.fg.setAttribute('class', 'guidat-slider-fg');
 
     this.domElement.appendChild(this.fg);
-    
+
     var onDrag = function(e) {
         if (!clicked) return;
         var pos = findPos(_this.domElement);
@@ -671,7 +671,7 @@ GUI.Slider = function(numberController, min, max, step, initValue) {
         val = Math.round(val/step)*step;
         numberController.setValue(val);
     };
-    
+
     this.domElement.addEventListener('mousedown', function(e) {
         clicked = true;
         x = px = e.pageX;
@@ -681,12 +681,12 @@ GUI.Slider = function(numberController, min, max, step, initValue) {
         onDrag(e);
         document.addEventListener('mouseup', mouseup, false);
     }, false);
-    
-    var mouseup = function(e) { 
+
+    var mouseup = function(e) {
         _this.domElement.className = _this.domElement.className.replace(' active', '');
         _this.fg.className = _this.fg.className.replace(' active', '');
         numberController.domElement.className = numberController.domElement.className.replace(' active', '');
-        clicked = false;            
+        clicked = false;
         if (numberController.finishChangeFunction != null) {
             numberController.finishChangeFunction.call(this, numberController.getValue());
         }
@@ -878,26 +878,26 @@ GUI.BooleanController = function() {
 };
 GUI.extendController(GUI.BooleanController);
 GUI.FunctionController = function() {
-    
+
     this.type = "function";
-    
+
     var _this = this;
-    
+
     GUI.Controller.apply(this, arguments);
-    
+
     this.domElement.addEventListener('click', function() {
         _this.fire();
     }, false);
-    
+
     this.domElement.style.cursor = "pointer";
     this.propertyNameElement.style.cursor = "pointer";
-    
+
     var fireFunction = null;
     this.onFire = function(fnc) {
         fireFunction = fnc;
         return this;
     }
-    
+
     this.fire = function() {
         if (fireFunction != null) {
             fireFunction.call(this);
@@ -1017,9 +1017,9 @@ GUI.NumberController = function() {
 
         GUI.makeUnselectable(_this.parent.domElement);
         GUI.makeUnselectable(numberField);
-        
+
         if(slider) slider.domElement.className += ' active';
-        
+
         py = y;
         y = e.pageY;
         var dy = py - y;

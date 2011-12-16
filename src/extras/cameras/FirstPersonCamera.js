@@ -195,7 +195,7 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		var now = new Date().getTime();
 		this.tdiff = ( now - this.lastUpdate ) / 1000;
 		this.lastUpdate = now;
-		
+
 		if ( !this.freeze ) {
 
 
