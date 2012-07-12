@@ -214,7 +214,7 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 		vertexPositionArray = file.body.vertices,
 		vertexNormalArray = file.body.normals;
 
-		var vertexUvArray, vertexColorArray;
+		var vertexUvArray, vertexColorArray, vertexMorphTargets = [];
 
 		if ( file.body.uvMaps !== undefined && file.body.uvMaps.length > 0 ) {
 
@@ -222,154 +222,45 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		}
 
-		if ( file.body.attrMaps !== undefined && file.body.attrMaps.length > 0 && file.body.attrMaps[ 0 ].name === "Color" ) {
+		if ( file.body.attrMaps !== undefined && file.body.attrMaps.length > 0 ) {
 
-			vertexColorArray = file.body.attrMaps[ 0 ].attr;
+			var attrname, array;
+
+			for (var i = 0, il = file.body.attrMaps.length; i < il; i++) {
+
+				attrname = file.body.attrMaps[i].name;
+
+				if (attrname == "Color") {
+
+					vertexColorArray = file.body.attrMaps[ i ].attr;
+
+				} else if (attrname.slice(0, 11) == "morphTarget") {
+
+					array = file.body.attrMaps[i].attr;
+					vertexMorphTargets.push( { array:array, stride:4 } );
+
+				} else {
+
+					console.log("Found unknown attribute: "+attrname);
+
+				}
+
+			}
 
 		}
 
 		// reorder vertices
 		// (needed for buffer splitting, to keep together face vertices)
 
-		if ( reorderVertices ) {
+		if ( reorderVertices && vertexPositionArray.length / 3 > 65536 ) {
 
-			var newFaces = new Uint32Array( vertexIndexArray.length ),
-				newVertices = new Float32Array( vertexPositionArray.length );
+			scope.reorderVertices();
 
-			var newNormals, newUvs, newColors;
+		} else {
 
-			if ( vertexNormalArray ) newNormals = new Float32Array( vertexNormalArray.length );
-			if ( vertexUvArray ) newUvs = new Float32Array( vertexUvArray.length );
-			if ( vertexColorArray ) newColors = new Float32Array( vertexColorArray.length );
-
-			var indexMap = {}, vertexCounter = 0;
-
-			function handleVertex( v ) {
-
-				if ( indexMap[ v ] === undefined ) {
-
-					indexMap[ v ] = vertexCounter;
-
-					var sx = v * 3,
-						sy = v * 3 + 1,
-						sz = v * 3 + 2,
-
-						dx = vertexCounter * 3,
-						dy = vertexCounter * 3 + 1,
-						dz = vertexCounter * 3 + 2;
-
-					newVertices[ dx ] = vertexPositionArray[ sx ];
-					newVertices[ dy ] = vertexPositionArray[ sy ];
-					newVertices[ dz ] = vertexPositionArray[ sz ];
-
-					if ( vertexNormalArray ) {
-
-						newNormals[ dx ] = vertexNormalArray[ sx ];
-						newNormals[ dy ] = vertexNormalArray[ sy ];
-						newNormals[ dz ] = vertexNormalArray[ sz ];
-
-					}
-
-					if ( vertexUvArray ) {
-
-						newUvs[ vertexCounter * 2 ] 	= vertexUvArray[ v * 2 ];
-						newUvs[ vertexCounter * 2 + 1 ] = vertexUvArray[ v * 2 + 1 ];
-
-					}
-
-					if ( vertexColorArray ) {
-
-						newColors[ vertexCounter * 4 ] 	   = vertexColorArray[ v * 4 ];
-						newColors[ vertexCounter * 4 + 1 ] = vertexColorArray[ v * 4 + 1 ];
-						newColors[ vertexCounter * 4 + 2 ] = vertexColorArray[ v * 4 + 2 ];
-						newColors[ vertexCounter * 4 + 3 ] = vertexColorArray[ v * 4 + 3 ];
-
-					}
-
-					vertexCounter += 1;
-
-				}
-
-			}
-
-			var a, b, c;
-
-			for ( var i = 0; i < vertexIndexArray.length; i += 3 ) {
-
-				a = vertexIndexArray[ i ];
-				b = vertexIndexArray[ i + 1 ];
-				c = vertexIndexArray[ i + 2 ];
-
-				handleVertex( a );
-				handleVertex( b );
-				handleVertex( c );
-
-				newFaces[ i ] 	  = indexMap[ a ];
-				newFaces[ i + 1 ] = indexMap[ b ];
-				newFaces[ i + 2 ] = indexMap[ c ];
-
-			}
-
-			vertexIndexArray = newFaces;
-			vertexPositionArray = newVertices;
-
-			if ( vertexNormalArray ) vertexNormalArray = newNormals;
-			if ( vertexUvArray ) vertexUvArray = newUvs;
-			if ( vertexColorArray ) vertexColorArray = newColors;
+			scope.offsets = [{ start: 0, count: vertexIndexArray.length, index: 0 }];
 
 		}
-
-		// compute offsets
-
-		scope.offsets = [];
-
-		var indices = vertexIndexArray;
-
-		var start = 0,
-			min = vertexPositionArray.length,
-			max = 0,
-			minPrev = min;
-
-		for ( var i = 0; i < indices.length; ) {
-
-			for ( var j = 0; j < 3; ++ j ) {
-
-				var idx = indices[ i ++ ];
-
-				if ( idx < min ) min = idx;
-				if ( idx > max ) max = idx;
-
-			}
-
-			if ( max - min > 65535 ) {
-
-				i -= 3;
-
-				for ( var k = start; k < i; ++ k ) {
-
-					indices[ k ] -= minPrev;
-
-				}
-
-				scope.offsets.push( { start: start, count: i - start, index: minPrev } );
-
-				start = i;
-				min = vertexPositionArray.length;
-				max = 0;
-
-			}
-
-			minPrev = min;
-
-		}
-
-		for ( var k = start; k < i; ++ k ) {
-
-			indices[ k ] -= minPrev;
-
-		}
-
-		scope.offsets.push( { start: start, count: i - start, index: minPrev } );
 
 		// recast CTM 32-bit indices as 16-bit WebGL indices
 
@@ -400,6 +291,8 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		}
 
+		scope.morphTargets = vertexMorphTargets;
+
 	}
 
 	Model.prototype = Object.create( THREE.BufferGeometry.prototype );
@@ -411,6 +304,12 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 	if ( geometry.attributes[ "normal" ] === undefined ) {
 
 		geometry.computeVertexNormals();
+
+	}
+
+	if ( geometry.morphTargets.length > 0 ) {
+
+		geometry.computeMorphNormals();
 
 	}
 

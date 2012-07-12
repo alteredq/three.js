@@ -22,6 +22,7 @@ THREE.BufferGeometry = function () {
 	// for compatibility
 
 	this.morphTargets = [];
+	this.morphNormals = [];
 
 };
 
@@ -267,6 +268,256 @@ THREE.BufferGeometry.prototype = {
 			this.normalsNeedUpdate = true;
 
 		}
+
+	}, 
+
+	computeMorphNormals: function () {
+		//Adapted from js-openctm
+
+		for ( var m = 0, ml = this.morphTargets.length; m < ml; m++ ) {
+
+			var stride = this.morphTargets[ m ].stride;
+			var vertices = this.morphTargets[ m ].array;
+			var indices = this.attributes.index.array;
+
+			var smooth = new Float32Array(vertices.length / stride * 3),
+				sidx, sidy, sidz,
+				indx, indy, indz, nx, ny, nz,
+				v1x, v1y, v1z, v2x, v2y, v2z, len,
+				i, k;
+
+			for (i = 0, k = indices.length; i < k;){
+				indx = indices[i ++];
+				indy = indices[i ++];
+				indz = indices[i ++];
+				sidx = indx * 3;
+				sidy = indy * 3;
+				sidz = indz * 3;
+				indx *= stride;
+				indy *= stride;
+				indz *= stride;
+
+				v1x = vertices[indy]     - vertices[indx];
+				v2x = vertices[indz]     - vertices[indx];
+				v1y = vertices[indy + 1] - vertices[indx + 1];
+				v2y = vertices[indz + 1] - vertices[indx + 1];
+				v1z = vertices[indy + 2] - vertices[indx + 2];
+				v2z = vertices[indz + 2] - vertices[indx + 2];
+
+				nx = v1y * v2z - v1z * v2y;
+				ny = v1z * v2x - v1x * v2z;
+				nz = v1x * v2y - v1y * v2x;
+
+				len = Math.sqrt(nx * nx + ny * ny + nz * nz);
+				if (len > 1e-10){
+					nx /= len;
+					ny /= len;
+					nz /= len;
+				}
+
+				smooth[sidx]     += nx;
+				smooth[sidx + 1] += ny;
+				smooth[sidx + 2] += nz;
+				smooth[sidy]     += nx;
+				smooth[sidy + 1] += ny;
+				smooth[sidy + 2] += nz;
+				smooth[sidz]     += nx;
+				smooth[sidz + 1] += ny;
+				smooth[sidz + 2] += nz;
+			}
+
+			for (i = 0, k = smooth.length; i < k; i += 3){
+				len = Math.sqrt(
+					smooth[i] * smooth[i] + 
+					smooth[i + 1] * smooth[i + 1] +	
+					smooth[i + 2] * smooth[i + 2]);
+
+				if(len > 1e-10){
+					smooth[i]     /= len;
+					smooth[i + 1] /= len;
+					smooth[i + 2] /= len;
+				}
+			}
+		
+			this.morphNormals.push( smooth );
+
+		}
+
+	},
+
+	reorderVertices: function () {
+
+		var scope = this;
+
+		var vertexIndexArray = this.attributes.index.array,
+			vertexPositionArray = this.attributes.position.array,
+			vertexNormalArray = this.attributes.normal.array,
+			vertexUvArray = this.attributes.uv.array,
+			vertexColorArray = this.attributes.color.array;
+
+		var newFaces = new Uint32Array( vertexIndexArray.length ),
+			newVertices = new Float32Array( vertexPositionArray.length );
+
+		var newNormals, newUvs, newColors, newMorphTargets, morph, nmorph, vmorph, array;
+
+		if ( vertexNormalArray ) newNormals = new Float32Array( vertexNormalArray.length );
+		if ( vertexUvArray ) newUvs = new Float32Array( vertexUvArray.length );
+		if ( vertexColorArray ) newColors = new Float32Array( vertexColorArray.length );
+
+		for (var i = 0, il = this.morphTargets.length; i < il; i++) {
+
+			morph = this.morphTargets[ i ];
+			array = new Float32Array(morph.array.length / morph.stride * 3);
+
+			newMorphTargets.push({array:array, stride:3});
+
+		}
+
+		var indexMap = {}, vertexCounter = 0;
+
+		function handleVertex( v ) {
+
+			if ( indexMap[ v ] === undefined ) {
+
+				indexMap[ v ] = vertexCounter;
+
+				var sx = v * 3,
+					sy = v * 3 + 1,
+					sz = v * 3 + 2,
+
+					dx = vertexCounter * 3,
+					dy = vertexCounter * 3 + 1,
+					dz = vertexCounter * 3 + 2;
+
+				newVertices[ dx ] = vertexPositionArray[ sx ];
+				newVertices[ dy ] = vertexPositionArray[ sy ];
+				newVertices[ dz ] = vertexPositionArray[ sz ];
+
+				if ( vertexNormalArray ) {
+
+					newNormals[ dx ] = vertexNormalArray[ sx ];
+					newNormals[ dy ] = vertexNormalArray[ sy ];
+					newNormals[ dz ] = vertexNormalArray[ sz ];
+
+				}
+
+				if ( vertexUvArray ) {
+
+					newUvs[ vertexCounter * 2 ] 	= vertexUvArray[ v * 2 ];
+					newUvs[ vertexCounter * 2 + 1 ] = vertexUvArray[ v * 2 + 1 ];
+
+				}
+
+				if ( vertexColorArray ) {
+
+					newColors[ vertexCounter * 4 ] 	   = vertexColorArray[ v * 4 ];
+					newColors[ vertexCounter * 4 + 1 ] = vertexColorArray[ v * 4 + 1 ];
+					newColors[ vertexCounter * 4 + 2 ] = vertexColorArray[ v * 4 + 2 ];
+					newColors[ vertexCounter * 4 + 3 ] = vertexColorArray[ v * 4 + 3 ];
+
+				}
+
+				if ( scope.morphTargets.length > 0 ) {
+
+					for (var i = 0, il = scope.morphTargets.length; i < il; i++) {
+
+						nmorph = newMorphTargets[i];
+						vmorph = scope.morphTargets[i];
+
+						nmorph.array[vertexCounter * nmorph.stride ]    = vmorph.array[ v*vmorph.stride ];
+						nmorph.array[vertexCounter * nmorph.stride + 1] = vmorph.array[ v*vmorph.stride + 1];
+						nmorph.array[vertexCounter * nmorph.stride + 2] = vmorph.array[ v*vmorph.stride + 2];
+
+					}
+
+				}
+
+				vertexCounter += 1;
+
+			}
+
+		}
+
+		var a, b, c;
+
+		for ( var i = 0; i < vertexIndexArray.length; i += 3 ) {
+
+			a = vertexIndexArray[ i ];
+			b = vertexIndexArray[ i + 1 ];
+			c = vertexIndexArray[ i + 2 ];
+
+			handleVertex( a );
+			handleVertex( b );
+			handleVertex( c );
+
+			newFaces[ i ] 	  = indexMap[ a ];
+			newFaces[ i + 1 ] = indexMap[ b ];
+			newFaces[ i + 2 ] = indexMap[ c ];
+
+		}
+
+		vertexIndexArray = newFaces;
+		vertexPositionArray = newVertices;
+
+		scope.attributes.index.array = newFaces;
+		scope.attributes.position.array = newVertices;
+		scope.morphTargets = newMorphTargets;
+
+		if ( vertexNormalArray ) scope.attributes.normal.array = newNormals;
+		if ( vertexUvArray ) scope.attributes.uv.array = newUvs;
+		if ( vertexColorArray ) scope.attributes.color.array = newColors;
+
+		// compute offsets
+
+		scope.offsets = [];
+
+		var indices = vertexIndexArray;
+
+		var start = 0,
+			min = vertexPositionArray.length,
+			max = 0,
+			minPrev = min;
+
+		for ( var i = 0; i < indices.length; ) {
+
+			for ( var j = 0; j < 3; ++ j ) {
+
+				var idx = indices[ i ++ ];
+
+				if ( idx < min ) min = idx;
+				if ( idx > max ) max = idx;
+
+			}
+
+			if ( max - min > 65535 ) {
+
+				i -= 3;
+
+				for ( var k = start; k < i; ++ k ) {
+
+					indices[ k ] -= minPrev;
+
+				}
+
+				scope.offsets.push( { start: start, count: i - start, index: minPrev } );
+
+				start = i;
+				min = vertexPositionArray.length;
+				max = 0;
+
+			}
+
+			minPrev = min;
+
+		}
+
+		for ( var k = start; k < i; ++ k ) {
+
+			indices[ k ] -= minPrev;
+
+		}
+
+		scope.offsets.push( { start: start, count: i - start, index: minPrev } );
 
 	}
 
