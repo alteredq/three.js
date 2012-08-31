@@ -392,7 +392,8 @@ THREE.ShaderChunk = {
 				"vec3 N = normalize( surf_norm );",
 
 				"vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;",
-				"mapN.xy = normalScale * mapN.xy;",
+				"mapN.xy *= abs( normalScale );",
+				"mapN.y *= sign( normalScale );",
 				"mat3 tsn = mat3( S, T, N );",
 				"return normalize( tsn * mapN );",
 

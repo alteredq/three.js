@@ -232,7 +232,8 @@ THREE.ShaderUtils = {
 					"vec3 specularTex = vec3( 1.0 );",
 
 					"vec3 normalTex = texture2D( tNormal, vUv ).xyz * 2.0 - 1.0;",
-					"normalTex.xy *= uNormalScale;",
+					"normalTex.xy *= abs( uNormalScale );",
+					"normalTex.y *= sign( uNormalScale );",
 					"normalTex = normalize( normalTex );",
 
 					"if( enableDiffuse ) {",
