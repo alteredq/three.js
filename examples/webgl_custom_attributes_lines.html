@@ -131,7 +131,6 @@
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms:       uniforms,
-				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 				blending:       THREE.AdditiveBlending,
@@ -180,6 +179,8 @@
 				color[ v ].setHSV( v / vertices.length, 0.9, 0.9 );
 
 			}
+
+			geometry.customAttributes = attributes;
 
 			object.rotation.x = 0.2;
 

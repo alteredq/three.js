@@ -126,7 +126,6 @@
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms: 		uniforms,
-				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
 
@@ -222,7 +221,7 @@
 
 			}
 
-			//console.log( vertices.length );
+			geometry.customAttributes = attributes;
 
 			scene.add( object );
 

@@ -645,13 +645,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Buffer initialization
 
-	function initCustomAttributes ( geometry, object ) {
+	function initCustomAttributes ( geometry ) {
 
 		var nvertices = geometry.vertices.length;
 
-		var material = object.material;
-
-		if ( material.attributes ) {
+		if ( geometry.customAttributes ) {
 
 			if ( geometry.__webglCustomAttributesList === undefined ) {
 
@@ -659,9 +657,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			for ( var a in material.attributes ) {
+			for ( var a in geometry.customAttributes ) {
 
-				var attribute = material.attributes[ a ];
+				var attribute = geometry.customAttributes[ a ];
 
 				if ( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
 
@@ -693,7 +691,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function initParticleBuffers ( geometry, object ) {
+	function initParticleBuffers ( geometry ) {
 
 		var nvertices = geometry.vertices.length;
 
@@ -704,11 +702,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webglParticleCount = nvertices;
 
-		initCustomAttributes ( geometry, object );
+		initCustomAttributes ( geometry );
 
 	};
 
-	function initLineBuffers ( geometry, object ) {
+	function initLineBuffers ( geometry ) {
 
 		var nvertices = geometry.vertices.length;
 
@@ -717,11 +715,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webglLineCount = nvertices;
 
-		initCustomAttributes ( geometry, object );
+		initCustomAttributes ( geometry );
 
 	};
 
-	function initRibbonBuffers ( geometry, object ) {
+	function initRibbonBuffers ( geometry ) {
 
 		var nvertices = geometry.vertices.length;
 
@@ -731,7 +729,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webglVertexCount = nvertices;
 
-		initCustomAttributes ( geometry, object );
+		initCustomAttributes ( geometry );
 
 	};
 
@@ -831,7 +829,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// custom attributes
 
-		if ( material.attributes ) {
+		if ( geometry.customAttributes ) {
 
 			if ( geometryGroup.__webglCustomAttributesList === undefined ) {
 
@@ -839,12 +837,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			for ( var a in material.attributes ) {
+			for ( var a in geometry.customAttributes ) {
 
 				// Do a shallow copy of the attribute object so different geometryGroup chunks use different
 				// attribute buffers which are correctly indexed in the setMeshBuffers function
 
-				var originalAttribute = material.attributes[ a ];
+				var originalAttribute = geometry.customAttributes[ a ];
 
 				var attribute = {};
 
@@ -1638,13 +1636,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setMeshBuffers( geometryGroup, object, hint, dispose, material ) {
+	function setMeshBuffers( geometryGroup, object, hint, dispose ) {
 
 		if ( ! geometryGroup.__inittedArrays ) {
 
 			return;
 
 		}
+
+		var material = getBufferMaterial( object, geometryGroup );
 
 		var normalType = bufferGuessNormalType( material ),
 		vertexColorType = bufferGuessVertexColorType( material ),
@@ -4337,7 +4337,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if( ! geometry.__webglVertexBuffer ) {
 
 					createRibbonBuffers( geometry );
-					initRibbonBuffers( geometry, object );
+					initRibbonBuffers( geometry );
 
 					geometry.verticesNeedUpdate = true;
 					geometry.colorsNeedUpdate = true;
@@ -4352,7 +4352,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if( ! geometry.__webglVertexBuffer ) {
 
 					createLineBuffers( geometry );
-					initLineBuffers( geometry, object );
+					initLineBuffers( geometry );
 
 					geometry.verticesNeedUpdate = true;
 					geometry.colorsNeedUpdate = true;
@@ -4368,7 +4368,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if ( geometry instanceof THREE.Geometry ) {
 
 						createParticleBuffers( geometry );
-						initParticleBuffers( geometry, object );
+						initParticleBuffers( geometry );
 
 						geometry.verticesNeedUpdate = true;
 						geometry.colorsNeedUpdate = true;
@@ -4494,21 +4494,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					geometryGroup = geometry.geometryGroupsList[ i ];
 
-					material = getBufferMaterial( object, geometryGroup );
-
 					if ( geometry.buffersNeedUpdate ) {
 
 						initMeshBuffers( geometryGroup, object );
 
 					}
 
-					customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+					customAttributesDirty = geometry.customAttributes && areCustomAttributesDirty( geometry );
 
 					if ( geometry.verticesNeedUpdate || geometry.morphTargetsNeedUpdate || geometry.elementsNeedUpdate ||
 						 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
 						 geometry.colorsNeedUpdate || geometry.tangentsNeedUpdate || customAttributesDirty ) {
 
-						setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW, !geometry.dynamic, material );
+						setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
 					}
 
@@ -4524,15 +4522,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometry.buffersNeedUpdate = false;
 
-				material.attributes && clearCustomAttributes( material );
+				geometry.customAttributes && clearCustomAttributes( geometry );
 
 			}
 
 		} else if ( object instanceof THREE.Ribbon ) {
 
-			material = getBufferMaterial( object, geometry );
-
-			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+			customAttributesDirty = geometry.customAttributes && areCustomAttributesDirty( geometry );
 
 			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || geometry.normalsNeedUpdate || customAttributesDirty ) {
 
@@ -4544,13 +4540,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			geometry.colorsNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
 
-			material.attributes && clearCustomAttributes( material );
+			geometry.customAttributes && clearCustomAttributes( geometry );
 
 		} else if ( object instanceof THREE.Line ) {
 
-			material = getBufferMaterial( object, geometry );
-
-			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+			customAttributesDirty = geometry.customAttributes && areCustomAttributesDirty( geometry );
 
 			if ( geometry.verticesNeedUpdate ||  geometry.colorsNeedUpdate || customAttributesDirty ) {
 
@@ -4561,7 +4555,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			geometry.verticesNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
 
-			material.attributes && clearCustomAttributes( material );
+			geometry.customAttributes && clearCustomAttributes( geometry );
 
 		} else if ( object instanceof THREE.ParticleSystem ) {
 
@@ -4578,9 +4572,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				material = getBufferMaterial( object, geometry );
-
-				customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+				customAttributesDirty = geometry.customAttributes && areCustomAttributesDirty( geometry );
 
 				if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || object.sortParticles || customAttributesDirty ) {
 
@@ -4591,7 +4583,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				geometry.verticesNeedUpdate = false;
 				geometry.colorsNeedUpdate = false;
 
-				material.attributes && clearCustomAttributes( material );
+				geometry.customAttributes && clearCustomAttributes( geometry );
 
 			}
 
@@ -4601,11 +4593,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Objects updates - custom attributes check
 
-	function areCustomAttributesDirty ( material ) {
+	function areCustomAttributesDirty ( geometry ) {
 
-		for ( var a in material.attributes ) {
+		for ( var a in geometry.customAttributes ) {
 
-			if ( material.attributes[ a ].needsUpdate ) return true;
+			if ( geometry.customAttributes[ a ].needsUpdate ) return true;
 
 		}
 
@@ -4613,11 +4605,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function clearCustomAttributes ( material ) {
+	function clearCustomAttributes ( geometry ) {
 
-		for ( var a in material.attributes ) {
+		for ( var a in geometry.customAttributes ) {
 
-			material.attributes[ a ].needsUpdate = false;
+			geometry.customAttributes[ a ].needsUpdate = false;
 
 		}
 
@@ -4685,6 +4677,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.initMaterial = function ( material, lights, fog, object ) {
 
 		var u, a, identifiers, i, parameters, maxLightCount, maxBones, maxShadows, shaderID;
+
+		var geometry = object.geometry;
 
 		if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -4778,7 +4772,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		};
 
-		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, material.attributes, material.defines, parameters );
+		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, geometry.customAttributes, material.defines, parameters );
 
 		var attributes = material.program.attributes;
 
@@ -4795,9 +4789,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( material.attributes ) {
+		if ( geometry.customAttributes ) {
 
-			for ( a in material.attributes ) {
+			for ( a in geometry.customAttributes ) {
 
 				if ( attributes[ a ] !== undefined && attributes[ a ] >= 0 ) _gl.enableVertexAttribArray( attributes[ a ] );
 

@@ -115,7 +115,7 @@
 							  color:     { type: "c", value: new THREE.Color( 0xffffff ) }
 							};
 
-				var material = new THREE.ShaderMaterial( { uniforms: uniforms, attributes: attributes, vertexShader: vertexShader, fragmentShader: fragmentShader, side: THREE.DoubleSide } );
+				var material = new THREE.ShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader, side: THREE.DoubleSide } );
 
 				var position2 = attributes.position2.value;
 				var colors = attributes.customColor.value;
@@ -155,6 +155,8 @@
 					geometry.vertices.push( new THREE.Vector3( x1, y1, z1 ) );
 
 				}
+
+				geometry.customAttributes = attributes;
 
 				var ribbon = new THREE.Ribbon( geometry, material );
 				scene.add( ribbon );

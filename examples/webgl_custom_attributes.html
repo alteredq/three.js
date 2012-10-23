@@ -124,7 +124,6 @@
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms: 		uniforms,
-				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
 
@@ -146,6 +145,8 @@
 				noise[ v ] = Math.random() * 5;
 
 			}
+
+			geometry.customAttributes = attributes;
 
 			scene.add( sphere );
 

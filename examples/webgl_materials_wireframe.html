@@ -120,8 +120,9 @@
 				var valuesQuads = attributesQuads.center.value;
 
 				setupAttributes( geometryQuads, valuesQuads );
+				geometryQuads.customAttributes = attributesQuads;
 
-				var materialQuads = new THREE.ShaderMaterial( { uniforms: {}, attributes: attributesQuads, vertexShader: vertexShader, fragmentShader: fragmentShader } );
+				var materialQuads = new THREE.ShaderMaterial( { uniforms: {}, vertexShader: vertexShader, fragmentShader: fragmentShader } );
 
 				meshQuads = new THREE.Mesh( geometryQuads, materialQuads );
 				meshQuads.position.x = 300;
@@ -133,8 +134,9 @@
 				var valuesTris = attributesTris.center.value;
 
 				setupAttributes( geometryTris, valuesTris );
+				geometryTris.customAttributes = attributesTris;
 
-				var materialTris = new THREE.ShaderMaterial( { uniforms: {}, attributes: attributesTris, vertexShader: vertexShader, fragmentShader: fragmentShader } );
+				var materialTris = new THREE.ShaderMaterial( { uniforms: {}, vertexShader: vertexShader, fragmentShader: fragmentShader } );
 
 				meshTris = new THREE.Mesh( geometryTris, materialTris );
 				meshTris.position.x = -300;
@@ -148,8 +150,9 @@
 				var valuesMixed = attributesMixed.center.value;
 
 				setupAttributes( mixedGeometry, valuesMixed );
+				mixedGeometry.customAttributes = attributesMixed;
 
-				var materialMixed = new THREE.ShaderMaterial( { uniforms: {}, attributes: attributesMixed, vertexShader: vertexShader, fragmentShader: fragmentShader } );
+				var materialMixed = new THREE.ShaderMaterial( { uniforms: {}, vertexShader: vertexShader, fragmentShader: fragmentShader } );
 
 				meshMixed = new THREE.Mesh( mixedGeometry, materialMixed );
 				meshMixed.position.x = 0;

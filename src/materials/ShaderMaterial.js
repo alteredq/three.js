@@ -36,7 +36,6 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.vertexShader = "void main() {}";
 	this.uniforms = {};
 	this.defines = {};
-	this.attributes = null;
 
 	this.shading = THREE.SmoothShading;
 
@@ -70,8 +69,6 @@ THREE.ShaderMaterial.prototype.clone = function () {
 	material.vertexShader = this.vertexShader;
 
 	material.uniforms = THREE.UniformsUtils.clone( this.uniforms );
-
-	material.attributes = this.attributes;
 	material.defines = this.defines;
 
 	material.shading = this.shading;

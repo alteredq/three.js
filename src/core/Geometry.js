@@ -32,6 +32,8 @@ THREE.Geometry = function () {
 	this.skinWeights = [];
 	this.skinIndices = [];
 
+	this.customAttributes = null;
+
 	this.boundingBox = null;
 	this.boundingSphere = null;
 

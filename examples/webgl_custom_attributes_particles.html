@@ -120,7 +120,6 @@
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms: 		uniforms,
-				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
@@ -155,7 +154,6 @@
 			var values_size = attributes.size.value;
 			var values_color = attributes.customColor.value;
 
-
 			for( var v = 0; v < vertices.length; v++ ) {
 
 				values_size[ v ] = 10;
@@ -167,6 +165,8 @@
 					values_color[ v ].setHSV( 0.0 + 0.1 * ( v / vertices.length ), 0.9, 0.9 );
 
 			}
+
+			geometry.customAttributes = attributes;
 
 			scene.add( sphere );
 
