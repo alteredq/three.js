@@ -20,11 +20,11 @@
 
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
-		      
+
 		<!-- load the font file from canvas-text -->
 
 		<script type="text/javascript" src="fonts/helvetiker_regular.typeface.js"></script>
-        
+
 
 		<script type="text/javascript">
 
@@ -69,18 +69,18 @@
 				// Get text from hash
 
 				var theText = "Hello three.js! :)";
-				
+
 				var hash = document.location.hash.substr( 1 );
-				
+
 				if ( hash.length !== 0 ) {
-                   
+
 					theText = hash;
 
 				}
-                
+
 		var text3d = new THREE.TextGeometry( theText, {
 
-					size: 80, 
+					size: 80,
 					height: 20,
 					curveSegments: 2,
 					font: "helvetiker"

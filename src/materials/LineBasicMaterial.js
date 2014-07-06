@@ -5,14 +5,14 @@
  * parameters = {
  *  color: <hex>,
  *  opacity: <float>,
- 
+
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
- 
+
  *  linewidth: <float>,
- *  linecap: "round",  
+ *  linecap: "round",
  *  linejoin: "round",
- 
+
  *  vertexColors: <bool>
  * }
  */

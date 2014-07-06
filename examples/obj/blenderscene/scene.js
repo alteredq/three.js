@@ -7,7 +7,7 @@
  * geometries: 3
  * materials:  3
  * textures:   0
- */  
+ */
 
 var scene = {
 
@@ -15,7 +15,7 @@ var scene = {
 "urlBaseType" : "relativeToScene",
 
 
-"objects" : 
+"objects" :
 {
     "Cube.006" : {
         "geometry"  : "geo_Cube",
@@ -370,7 +370,7 @@ var scene = {
 },
 
 
-"geometries" : 
+"geometries" :
 {
     "geo_Cube" : {
         "type" : "ascii_mesh",
@@ -389,26 +389,26 @@ var scene = {
 },
 
 
-"materials" : 
+"materials" :
 {
     "Material" : {
         "type": "MeshPhongMaterial",
-        "parameters": { color: 10688800, opacity: 1.00, ambient: 0, specular: 8355711, shininess: 50.0 } 
+        "parameters": { color: 10688800, opacity: 1.00, ambient: 0, specular: 8355711, shininess: 50.0 }
     },
 
     "Material.001" : {
         "type": "MeshPhongMaterial",
-        "parameters": { color: 2401086, opacity: 1.00, ambient: 0, specular: 8355711, shininess: 50.0 } 
+        "parameters": { color: 2401086, opacity: 1.00, ambient: 0, specular: 8355711, shininess: 50.0 }
     },
 
     "Material.002" : {
         "type": "MeshPhongMaterial",
-        "parameters": { color: 10711076, opacity: 1.00, ambient: 0, specular: 8355711, shininess: 50.0 } 
+        "parameters": { color: 10711076, opacity: 1.00, ambient: 0, specular: 8355711, shininess: 50.0 }
     }
 },
 
 
-"cameras" : 
+"cameras" :
 {
     "default_camera" : {
         "type"  : "perspective",
@@ -422,7 +422,7 @@ var scene = {
 },
 
 
-"lights" : 
+"lights" :
 {
     "default_light": {
         "type"		 : "directional",
@@ -433,14 +433,14 @@ var scene = {
 },
 
 
-"transform" : 
+"transform" :
 {
     "position"  : [ 0.000000, 0.000000, 0.000000 ],
     "rotation"  : [ -1.570796, 0.000000, 0.000000 ],
     "scale"     : [ 1.000000, 1.000000, 1.000000 ],
 },
 
-"defaults" : 
+"defaults" :
 {
     "bgcolor" : [ 0.000000, 0.000000, 0.000000 ],
     "bgalpha" : 1.000000,

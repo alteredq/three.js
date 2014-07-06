@@ -9,4 +9,4 @@ THREE.AmbientLight = function ( hex ) {
 };
 
 THREE.AmbientLight.prototype = new THREE.Light();
-THREE.AmbientLight.prototype.constructor = THREE.AmbientLight; 
+THREE.AmbientLight.prototype.constructor = THREE.AmbientLight;

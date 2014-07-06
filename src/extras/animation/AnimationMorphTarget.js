@@ -58,15 +58,15 @@ THREE.AnimationMorphTarget.prototype.play = function( loop, startTimeMS ) {
 THREE.AnimationMorphTarget.prototype.pause = function() {
 
 	if( this.isPaused ) {
-		
+
 		THREE.AnimationHandler.addToUpdate( this );
-		
+
 	} else {
-		
+
 		THREE.AnimationHandler.removeFromUpdate( this );
-		
+
 	}
-	
+
 	this.isPaused = !this.isPaused;
 }
 
@@ -79,17 +79,17 @@ THREE.AnimationMorphTarget.prototype.stop = function() {
 
 	this.isPlaying = false;
 	this.isPaused  = false;
-	
+
 	THREE.AnimationHandler.removeFromUpdate( this );
-	
-	
+
+
 	// reset JIT matrix and remove cache
-	
+
 	for ( var h = 0; h < this.hierarchy.length; h++ ) {
-		
+
 		if ( this.hierarchy[ h ].animationCache !== undefined ) {
-			
-			delete this.hierarchy[ h ].animationCache;	
+
+			delete this.hierarchy[ h ].animationCache;
 		}
 
 	}
@@ -117,10 +117,10 @@ THREE.AnimationMorphTarget.prototype.update = function( deltaTimeMS ) {
 	var object;
 	var animationCache;
 	var currentTime, unloopedCurrentTime;
-	
+
 
 	// update time
-	
+
 	this.currentTime += deltaTimeMS * this.timeScale;
 
 	unloopedCurrentTime = this.currentTime;
@@ -191,24 +191,24 @@ THREE.AnimationMorphTarget.prototype.update = function( deltaTimeMS ) {
 
 		if ( scale < 0 || scale > 1 ) {
 
-			console.log( "THREE.AnimationMorphTarget.update: Warning! Scale out of bounds:" + scale ); 
+			console.log( "THREE.AnimationMorphTarget.update: Warning! Scale out of bounds:" + scale );
 			scale = scale < 0 ? 0 : 1;
 
 		}
 
 
 		// interpolate
-		
+
 		var pi, pmti = prevKey.morphTargetsInfluences;
 		var ni, nmti = nextKey.morphTargetsInfluences;
 		var mt, i;
-		
+
 		for( mt in pmti ) {
-			
+
 			pi = pmti[ mt ];
 			ni = nmti[ mt ];
 			i = this.root.getMorphTargetIndexByName( mt );
-			
+
 			this.root.morphTargetInfluences[ i ] = ( pi + ( ni - pi ) * scale ) * this.influence;
 		}
 

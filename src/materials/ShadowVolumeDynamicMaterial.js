@@ -6,21 +6,21 @@
  *  color: <hex>,
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
- 
+
  *  lightMap: new THREE.Texture( <Image> ),
- 
+
  *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
  *  combine: THREE.Multiply,
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
- 
+
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
- 
+
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
- 
+
  *  vertexColors: <bool>,
  *  skinning: <bool>
  * }

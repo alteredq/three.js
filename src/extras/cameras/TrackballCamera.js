@@ -366,7 +366,7 @@ THREE.TrackballCamera = function ( parameters ) {
 		_state = this.STATE.NONE;
 
 	};
-	
+
 	function bind( scope, fn ) {
 
 		return function () {

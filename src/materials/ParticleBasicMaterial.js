@@ -6,12 +6,12 @@
  *  color: <hex>,
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
- 
+
  *  size: <float>,
- 
+
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
- 
+
  *  vertexColors: <bool>
  * }
  */

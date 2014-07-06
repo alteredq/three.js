@@ -14,7 +14,7 @@
 var model = {
 
     'version' : 2,
-    
+
     'materials': [	{
 	"DbgColor" : 0xeeeeee,
 	"DbgIndex" : 0,

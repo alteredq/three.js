@@ -463,7 +463,7 @@ THREE.Geometry.prototype = {
 				// should shared edge be included?
 				// comment out if not
 
-				hash = edge_hash( face.b, face.d ); 
+				hash = edge_hash( face.b, face.d );
 				addToMap( vfMap, hash, i );
 
 				hash = edge_hash( face.a, face.b );

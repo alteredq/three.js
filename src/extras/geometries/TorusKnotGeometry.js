@@ -35,7 +35,7 @@ THREE.TorusKnotGeometry = function ( radius, tube, segmentsR, segmentsT, p, q, h
 			var cx, cy;
 
 			tang.x = p2.x - p.x; tang.y = p2.y - p.y; tang.z = p2.z - p.z;
-			n.x = p2.x + p.x; n.y = p2.y + p.y; n.z = p2.z + p.z; 
+			n.x = p2.x + p.x; n.y = p2.y + p.y; n.z = p2.z + p.z;
 			bitan.cross( tang, n );
 			n.cross( bitan, tang );
 			bitan.normalize();
@@ -60,10 +60,10 @@ THREE.TorusKnotGeometry = function ( radius, tube, segmentsR, segmentsT, p, q, h
 
 			var ip = ( i + 1 ) % this.segmentsR;
 			var jp = ( j + 1 ) % this.segmentsT;
-			var a = this.grid[ i ][ j ]; 
+			var a = this.grid[ i ][ j ];
 			var b = this.grid[ ip ][ j ];
 			var c = this.grid[ ip ][ jp ];
-			var d = this.grid[ i ][ jp ]; 
+			var d = this.grid[ i ][ jp ];
 
 			var uva = new THREE.UV( i / this.segmentsR, j / this.segmentsT );
 			var uvb = new THREE.UV( ( i + 1 ) / this.segmentsR, j / this.segmentsT );

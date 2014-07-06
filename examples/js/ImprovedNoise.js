@@ -57,7 +57,7 @@ var ImprovedNoise = function () {
 
 			var A = p[X]+Y, AA = p[A]+Z, AB = p[A+1]+Z, B = p[X+1]+Y, BA = p[B]+Z, BB = p[B+1]+Z;
 
-			return lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z), 
+			return lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z),
 							grad(p[BA], xMinus1, y, z)),
 						lerp(u, grad(p[AB], x, yMinus1, z),
 							grad(p[BB], xMinus1, yMinus1, z))),

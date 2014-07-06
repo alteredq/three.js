@@ -4,16 +4,16 @@
  * parameters = {
  *  fragmentShader: <string>,
  *  vertexShader: <string>,
- 
+
  *  uniforms: { "parameter1": { type: "f", value: 1.0 }, "parameter2": { type: "i" value2: 2 } },
- 
+
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
- 
+
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
- 
+
  *  lights: <bool>,
  *  vertexColors: <bool>,
  *  skinning: <bool>,

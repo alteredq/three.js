@@ -1,4 +1,4 @@
-Music from Newgrounds Audio portal, licensed under 
+Music from Newgrounds Audio portal, licensed under
 Creative Commons Attribution Noncommercial Share Alike
 
 Bad Cat [Master Version] by Skullbeatz

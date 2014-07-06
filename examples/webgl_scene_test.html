@@ -300,7 +300,7 @@
 					$( "start" ).className = "enabled";
 
 					handle_update( result, 1 );
-					
+
 					console.log( result );
 
 				}
@@ -308,10 +308,10 @@
 				$( "progress" ).style.display = "block";
 
 				var loader = new THREE.SceneLoader();
-				
+
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
-				
+
 				loader.load( "scenes/test_scene.js", callbackFinished );
 
 				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );

@@ -54,7 +54,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var postprocessing = false;
-			
+
 			var mouseX = 0, mouseY = 0,
 
 			windowHalfX = window.innerWidth / 2,
@@ -93,14 +93,14 @@
 				n_sub = 6;
 
 				var position, index;
-				
+
 				var spline = new THREE.Spline( points );
-				
+
 				for ( i = 0; i < points.length * n_sub; i ++ ) {
-				
+
 					index = i / ( points.length * n_sub );
 					position = spline.getPoint( index );
-					
+
 					geometry.vertices[ i ] = new THREE.Vertex( new THREE.Vector3( position.x, position.y, position.z ) );
 
 					colors[ i ] = new THREE.Color( 0xffffff );
@@ -112,8 +112,8 @@
 
 					colors3[ i ] = new THREE.Color( 0xffffff );
 					colors3[ i ].setHSV( i / ( points.length * n_sub ), 1.0, 1.0 );
-					
-					
+
+
 				}
 
 				geometry2.vertices = geometry3.vertices = geometry.vertices;
@@ -307,7 +307,7 @@
 				renderer.clear();
 
 				if ( postprocessing ) {
-				
+
 					// Render scene into texture
 
 					renderer.render( scene, camera, rtTexture1 );
@@ -343,7 +343,7 @@
 					renderer.render( sceneScreen, cameraOrtho );
 
 				} else {
-				
+
 					renderer.render( scene, camera );
 
 				}
